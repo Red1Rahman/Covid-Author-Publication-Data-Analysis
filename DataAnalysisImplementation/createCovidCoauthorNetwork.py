@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd, itertools
 
 covidAuthorData = pd.read_csv('./MinedDataset/datasetForCovidAuthorConnectivityGraph.csv')
 
@@ -15,4 +15,17 @@ for index, row in covidAuthorData.iterrows():
 datasetOfEachPublicationAuthors = pd.DataFrame({'Publication': publlicationDictionary.keys(), 'Authors': publlicationDictionary.values()})
 datasetOfEachPublicationAuthors.to_csv('./MinedDataset/datasetOfEachPublicationAuthors.csv')
 
+coAuthorDictionary = {}
+
+for publicationId in publlicationDictionary.keys():
+    authorIdList = publlicationDictionary[publicationId]
+    for authorId in authorIdList:
+        if authorId not in coAuthorDictionary.keys():
+            coAuthorDictionary[authorId] = []
+        for coAuthorId in authorIdList:
+            if(authorId!=coAuthorId and coAuthorId not in coAuthorDictionary[authorId]):
+                coAuthorDictionary[authorId].append(coAuthorId)
+
+coAuthorNetworkDataSet = pd.DataFrame({'AuthorId': coAuthorDictionary.keys(), 'Co-Authors': coAuthorDictionary.values()})
+coAuthorNetworkDataSet.to_csv('./MinedDataset/coAuthorNetworkDataSet.csv')
 
