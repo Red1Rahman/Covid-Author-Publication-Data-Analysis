@@ -3,29 +3,34 @@ import pandas as pd, itertools
 covidAuthorData = pd.read_csv('./MinedDataset/datasetForCovidAuthorConnectivityGraph.csv')
 
 publlicationDictionary = {}
+
 for index, row in covidAuthorData.iterrows():
     currentRowPublicationList = row["All Publications on Coronavirus"].split(';')
     for publicationId in currentRowPublicationList:
         publicationId = publicationId.replace('nan', '')
         if publicationId not in publlicationDictionary.keys():
-            publlicationDictionary[publicationId] = []    
-        publlicationDictionary[publicationId].append(row["Author ID"])
+            publlicationDictionary[publicationId] = {}
+        
+        publlicationDictionary[publicationId][str(row["Author ID"])] = {'Name': row["Full Name"], 'Country' : row["Country"]}
 
 
 datasetOfEachPublicationAuthors = pd.DataFrame({'Publication': publlicationDictionary.keys(), 'Authors': publlicationDictionary.values()})
-datasetOfEachPublicationAuthors.to_csv('./MinedDataset/datasetOfEachPublicationAuthors.csv')
+datasetOfEachPublicationAuthors.to_csv('./MinedDataset/datasetOfEachPublicationAuthorsWithMoreInfo.csv')
 
 coAuthorDictionary = {}
 
 for publicationId in publlicationDictionary.keys():
-    authorIdList = publlicationDictionary[publicationId]
+    authorIdList = publlicationDictionary[publicationId].keys()
     for authorId in authorIdList:
+        country = publlicationDictionary[publicationId].get('Country')
+        name = publlicationDictionary[publicationId].get('Full Name')
         if authorId not in coAuthorDictionary.keys():
-            coAuthorDictionary[authorId] = []
+            coAuthorDictionary[authorId] = {'Name': name, 'Country' : country, 'CoAuthors': []}
+
+
         for coAuthorId in authorIdList:
             if(authorId!=coAuthorId and coAuthorId not in coAuthorDictionary[authorId]):
-                coAuthorDictionary[authorId].append(coAuthorId)
+                coAuthorDictionary[authorId].get('CoAuthors').append(coAuthorId)
 
-coAuthorNetworkDataSet = pd.DataFrame({'AuthorId': coAuthorDictionary.keys(), 'Co-Authors': coAuthorDictionary.values()})
-coAuthorNetworkDataSet.to_csv('./MinedDataset/coAuthorNetworkDataSet.csv')
-
+coAuthorNetworkDataSet = pd.DataFrame.from_dict(coAuthorDictionary, orient='index')
+coAuthorNetworkDataSet.to_csv('./MinedDataset/coAuthorNetworkDataSetWithMoreInfo.csv')
