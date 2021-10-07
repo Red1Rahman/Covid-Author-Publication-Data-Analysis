@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+#CSV files
+*.csv
+
+#Emacs edited file
+*~

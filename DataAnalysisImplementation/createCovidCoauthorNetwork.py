@@ -22,8 +22,8 @@ coAuthorDictionary = {}
 for publicationId in publlicationDictionary.keys():
     authorIdList = publlicationDictionary[publicationId].keys()
     for authorId in authorIdList:
-        country = publlicationDictionary[publicationId].get('Country')
-        name = publlicationDictionary[publicationId].get('Full Name')
+        country = publlicationDictionary[publicationId].get(authorId).get('Country')
+        name = publlicationDictionary[publicationId].get(authorId).get('Name')
         if authorId not in coAuthorDictionary.keys():
             coAuthorDictionary[authorId] = {'Name': name, 'Country' : country, 'CoAuthors': []}
 
